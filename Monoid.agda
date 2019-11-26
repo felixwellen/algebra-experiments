@@ -1,5 +1,6 @@
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --cubical --safe #-}
 
+open import Cubical.Foundations.Prelude
 open import Basics
 open import Naturals
 open import List
@@ -11,8 +12,8 @@ record monoid-struct {A : Set} : Set where
   field
     _*_ : A → A → A
     unit : A
-    associative : (a b c : A) → ((a * b) * c) ≈ (a * (b * c))
-    unital : (a : A) → (a * unit) ≈ a and a ≈ (unit * a)
+    associative : (a b c : A) → ((a * b) * c) ≡ (a * (b * c))
+    unital : (a : A) → ((a * unit) ≡ a) and (a ≡ (unit * a))
 
 
 instance
@@ -43,14 +44,14 @@ record monoid-morphism-struct
   open monoid-struct A-is-monoid renaming (unit to unit-A; _*_ to _*A_)
   open monoid-struct B-is-monoid renaming (unit to unit-B; _*_ to _*B_)
   field
-    unital : f unit-A ≈ unit-B
-    homomorphic : (x y : A) → f (x *A y) ≈ f x *B f y
+    unital : f unit-A ≡ unit-B
+    homomorphic : (x y : A) → f (x *A y) ≡ f x *B f y
 
 
 length-homomorphic :  {A : Set} (l l′ : list A)
-  → length (l ⊕ l′) ≈ length l +ℕ length l′
+  → length (l ⊕ l′) ≡ length l +ℕ length l′
 length-homomorphic [] l′ = refl
-length-homomorphic (x ∷ l) l′ = ap succ (length-homomorphic l l′)
+length-homomorphic (x ∷ l) l′ = cong succ (length-homomorphic l l′)
 
 
 lists-ℕ : {A : Set} → monoid-morphism-struct length
@@ -67,8 +68,8 @@ record []-monoid-struct {A : Set} : Set where
   field
     _*_ : A → A → A
     *[] : list A → A
-    is-left-inverse : (a : A) → *[] [ a ] ≈ a
-    *[]-homomorphic : (l l′ : list A) → *[] (l ⊕ l′) ≈ (*[] l) * (*[] l′)
+    is-left-inverse : (a : A) → *[] [ a ] ≡ a
+    *[]-homomorphic : (l l′ : list A) → *[] (l ⊕ l′) ≡ (*[] l) * (*[] l′)
 
   unit : A
   unit = *[] []
@@ -76,17 +77,17 @@ record []-monoid-struct {A : Set} : Set where
   *[_] : A → A
   *[ x ] = *[] [ x ]
 
-  *-is-associative : (x y z : A) →  x * (y * z) ≈ (x * y) * z
+  *-is-associative : (x y z : A) →  x * (y * z) ≡ (x * y) * z
   *-is-associative x y z =
-                         (x * (y * z))                 ≈⟨ ap (λ u → x * (y * u)) (≈-is-symmetric (is-left-inverse z)) ⟩
-                         (x * (y * *[ z ]))            ≈⟨ ap (λ u → x * (u * *[ z ])) (≈-is-symmetric (is-left-inverse y)) ⟩
-                         (x * (*[ y ] * *[ z ]))       ≈⟨ ap (λ u → x * u) (≈-is-symmetric (*[]-homomorphic [ y ] [ z ])) ⟩
-                         (x * *[] (y ∷ [ z ]))         ≈⟨ ap (λ u → u * *[] (y ∷ [ z ])) (≈-is-symmetric (is-left-inverse x)) ⟩
-                         (*[ x ] * *[] (y ∷ [ z ]))    ≈⟨ ≈-is-symmetric (*[]-homomorphic [ x ] (y ∷ [ z ])) ⟩
-                         *[] (x ∷ y ∷ [ z ])           ≈⟨ *[]-homomorphic (x ∷ [ y ]) [ z ] ⟩
-                         (*[] (x ∷ [ y ]) * *[ z ])    ≈⟨ ap (λ u → (*[] (x ∷ [ y ]) * u)) (is-left-inverse z) ⟩ 
-                         (*[] (x ∷ [ y ]) * z)         ≈⟨ ap (λ u → u * z) (*[]-homomorphic [ x ] [ y ]) ⟩ 
-                         ((*[ x ] * *[ y ]) * z)       ≈⟨ ap (λ u → (u * *[ y ]) * z) (is-left-inverse x) ⟩ 
-                         ((x * *[ y ]) * z)            ≈⟨ ap (λ u → (x * u) * z) (is-left-inverse y) ⟩ 
-                         ((x * y) * z)                 ≈∎ 
+                         (x * (y * z))                 ≡⟨ cong (λ u → x * (y * u)) (sym (is-left-inverse z)) ⟩
+                         (x * (y * *[ z ]))            ≡⟨ cong (λ u → x * (u * *[ z ])) (sym (is-left-inverse y)) ⟩
+                         (x * (*[ y ] * *[ z ]))       ≡⟨ cong (λ u → x * u) (sym (*[]-homomorphic [ y ] [ z ])) ⟩
+                         (x * *[] (y ∷ [ z ]))         ≡⟨ cong (λ u → u * *[] (y ∷ [ z ])) (sym (is-left-inverse x)) ⟩
+                         (*[ x ] * *[] (y ∷ [ z ]))    ≡⟨ sym (*[]-homomorphic [ x ] (y ∷ [ z ])) ⟩
+                         *[] (x ∷ y ∷ [ z ])           ≡⟨ *[]-homomorphic (x ∷ [ y ]) [ z ] ⟩
+                         (*[] (x ∷ [ y ]) * *[ z ])    ≡⟨ cong (λ u → (*[] (x ∷ [ y ]) * u)) (is-left-inverse z) ⟩ 
+                         (*[] (x ∷ [ y ]) * z)         ≡⟨ cong (λ u → u * z) (*[]-homomorphic [ x ] [ y ]) ⟩ 
+                         ((*[ x ] * *[ y ]) * z)       ≡⟨ cong (λ u → (u * *[ y ]) * z) (is-left-inverse x) ⟩ 
+                         ((x * *[ y ]) * z)            ≡⟨ cong (λ u → (x * u) * z) (is-left-inverse y) ⟩ 
+                         ((x * y) * z)                 ∎ 
 

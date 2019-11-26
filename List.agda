@@ -1,5 +1,6 @@
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --cubical --safe #-}
 
+open import Cubical.Foundations.Prelude
 open import Basics
 open import Naturals
 
@@ -20,11 +21,11 @@ length : {A : Set} → list A → ℕ
 length [] = zero
 length (x ∷ l) = succ (length l)
 
-⊕-is-unital : {A : Set} (l : list A) → l ⊕ [] ≈ l and l ≈ [] ⊕ l
+⊕-is-unital : {A : Set} (l : list A) → (l ⊕ [] ≡ l) and (l ≡ [] ⊕ l)
 ⊕-is-unital [] = ⟨ refl and refl ⟩
-⊕-is-unital (x ∷ l) = ⟨ ap (λ l′ → x ∷ l′) (pr1 (⊕-is-unital l)) and refl ⟩
+⊕-is-unital (x ∷ l) = ⟨ cong (λ l′ → x ∷ l′) (pr1 (⊕-is-unital l)) and refl ⟩
 
 ⊕-is-associative : {A : Set} (l l′ l″ : list A)
-                   → (l ⊕ l′) ⊕ l″ ≈ l ⊕ (l′ ⊕ l″)
+                   → (l ⊕ l′) ⊕ l″ ≡ l ⊕ (l′ ⊕ l″)
 ⊕-is-associative [] l′ l″ = refl
-⊕-is-associative (x ∷ l) l′ l″ = ap (λ l → x ∷ l) (⊕-is-associative l l′ l″)
+⊕-is-associative (x ∷ l) l′ l″ = cong (λ l → x ∷ l) (⊕-is-associative l l′ l″)
