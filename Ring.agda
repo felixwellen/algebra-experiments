@@ -8,7 +8,7 @@ record ring-structure {A : Set} : Set where
   field
     _+_ : A → A → A
     -_ : A → A
-    0′ : A
+    0′ : A                    -- 0\'
     
     +-is-associative : (x y z : A) → x + (y + z) ≡ (x + y) + z
     +-is-unital : (x : A) → x + 0′ ≡ x
@@ -16,7 +16,7 @@ record ring-structure {A : Set} : Set where
     +-has-inverses : (x : A) → x + (- x) ≡ 0′
 
     _·_ : A → A → A            -- \cdot
-    1′ : A
+    1′ : A                     -- 1\'
     ·-is-associative : (x y z : A) → x · (y · z) ≡ (x · y) · z
     ·-is-unital : (x : A) → 1′ · x ≡ x
     ·-is-commutative : (x y : A) → x · y ≡ y · x

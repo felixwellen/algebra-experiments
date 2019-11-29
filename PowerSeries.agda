@@ -2,6 +2,7 @@
 
 open import Cubical.Foundations.Prelude
 open import Ring
+open import List
 open import Naturals
 
 module PowerSeries (A : Set) {{ _ : ring-structure {A} }} where
@@ -9,8 +10,28 @@ module PowerSeries (A : Set) {{ _ : ring-structure {A} }} where
 
   seq =  ℕ → A
 
+  shift-by : ℕ → seq → seq
+  shift-by zero s = s
+  shift-by (succ k) s = λ n → (shift-by k s) (succ n)
+
+  shift-by-one = shift-by (succ zero)
+
+  [0,⋯,_] : ℕ → list ℕ
+  [0,⋯, zero ] = [ zero ]
+  [0,⋯, succ l ] =  [0,⋯, l ] ⊕ [ succ l ]
+
+  ∑ : list A → A
+  ∑ [] = 0′
+  ∑ (x ∷ l) = x + ∑ l
+  
+{-
+
+  take_from_ : ℕ → seq → list A
+  take zero from s = []
+  take succ k from s = (s zero) ∷ (take k from (shift-by-one s)) 
+
   cauchy-product : seq → seq → seq
-  cauchy-product a b = {!!}
+  cauchy-product a b n = ∑ [ (a i)·(b {!!}) ∣ i ∈ [0,⋯, n ] ]
 
   is-ring : ring-structure {seq}
   is-ring = record
@@ -29,4 +50,4 @@ module PowerSeries (A : Set) {{ _ : ring-structure {A} }} where
               ; distributive = {!!}
               }
   
-
+-}

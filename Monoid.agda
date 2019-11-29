@@ -61,9 +61,8 @@ lists-ℕ {A} =
     homomorphic = length-homomorphic {A}
   }
 
-[_] : {A : Set} → A → list A
-[ a ] = a ∷ []
 
+-- something I just wanted to check - no further meaning
 record []-monoid-struct {A : Set} : Set where
   field
     _*_ : A → A → A
