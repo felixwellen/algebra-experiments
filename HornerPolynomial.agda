@@ -28,19 +28,25 @@ module HornerPolynomial (R : Set) {{ _ : ring-structure {R} }} where
   is-0-truncated f f′ p q i j ∘ g =
     is-0-truncated (f ∘ g) (f′ ∘ g) (cong (_∘ g) p) (cong (_∘ g) q) i j
 
+  private
+    X = ((const 1′) ·X+ 0′)
 
   module _ (A : Type₀) (A-is-0-truncated : isOfHLevel 2 A) {{ _ : ring-structure {A} }}
                    {{ _ : algebra-structure R {A} }} where
     open algebra-structure {{...}}               
-    ev : A → (R[X] → A)
-    ev a (const r) = r ⋆ 1′
-    ev a (f ·X+ r) = (ev a f) · a + r ⋆ 1′
-    ev a (const0-nullifies r i) =
+    evaluate-at : A → (R[X] → A)
+    evaluate-at a (const r) = r ⋆ 1′
+    evaluate-at a (f ·X+ r) = (evaluate-at a f) · a + r ⋆ 1′
+    evaluate-at a (const0-nullifies r i) =
          let equality-to-construct =
                (0′ ⋆ 1′) · a + r ⋆ 1′ ≡⟨ cong (λ u → u · a + r ⋆ 1′) (sym (0-acts-nullifying 1′)) ⟩
                0′ · a + r ⋆ 1′        ≡⟨ cong (λ u → u + r ⋆ 1′) (0-nullifies′ a) ⟩
                0′ + r ⋆ 1′            ≡⟨ +-is-unital′ _ ⟩
                r ⋆ 1′                 ∎ 
          in equality-to-construct i
-    ev a (is-0-truncated f f′ p q i j) =
-      A-is-0-truncated (ev a f) (ev a f′) (cong (ev a) p) (cong (ev a) q) i j
+    evaluate-at a (is-0-truncated f f′ p q i j) =
+      A-is-0-truncated
+        (evaluate-at a f) (evaluate-at a f′) (cong (evaluate-at a) p) (cong (evaluate-at a) q) i j
+
+    image-of-X : (R[X] → A) → A
+    image-of-X f = f X
