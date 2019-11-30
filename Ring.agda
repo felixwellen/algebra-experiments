@@ -54,6 +54,9 @@ record ring-structure {A : Set} : Set where
                     x · 0′ + x · 0′  ∎
               in +-idempotency→0 _ x·0-is-idempotent
 
+  0-nullifies′ : (x : A) → 0′ · x ≡ 0′
+  0-nullifies′ x = sym (0-nullifies x ∙ ·-is-commutative x 0′)
+  
   infixl 10 _-_
   _-_ : A → A → A
   x - y = x + (- y)
@@ -89,14 +92,14 @@ data ZeroRing : Set where
                      }
 
 
-module _-algebra (𝔸 : Set) {{ _ : ring-structure {𝔸} }} where
+module _ (R : Set) {{ _ : ring-structure {R} }} where
 
   record algebra-structure {A : Set} {{ _ : ring-structure {A} }} : Set where
     open ring-structure {{...}}
     field
-      _⋆_ : 𝔸 → A → A        -- \*
-      ⋆-associates-with-· : (s t : 𝔸) (x : A) → s ⋆ (t ⋆ x) ≡ (s · t) ⋆ x
-      ⋆-distributes-with-+ : (s t : 𝔸) (x : A) → (s + t) ⋆ x ≡ s ⋆ x + t ⋆ x
+      _⋆_ : R → A → A        -- \*
+      ⋆-associates-with-· : (s t : R) (x : A) → s ⋆ (t ⋆ x) ≡ (s · t) ⋆ x
+      ⋆-distributes-with-+ : (s t : R) (x : A) → (s + t) ⋆ x ≡ s ⋆ x + t ⋆ x
       1-acts-trivial : (x : A) → 1′ ⋆ x ≡ x
 
     infixl 14 _⋆_
@@ -131,15 +134,15 @@ module _-algebra (𝔸 : Set) {{ _ : ring-structure {𝔸} }} where
       ·-homomorphic : (x y : A) → f (x · y) ≡ f x · f y 
       +-homomorphic : (x y : A) → f (x + y) ≡ f x + f y 
       ·-unital : f 1′ ≡ 1′
-      ⋆-homomorphic : (s : 𝔸) (x : A) → f (s ⋆ x) ≡ s ⋆ f x
-    
+      ⋆-homomorphic : (s : R) (x : A) → f (s ⋆ x) ≡ s ⋆ f x
+
     0-unital : 0′ ≡ f 0′
     0-unital =
       let idempotent = f 0′         ≡⟨ cong f (sym 0-idempotent) ⟩
                        f (0′ + 0′)  ≡⟨ +-homomorphic _ _ ⟩
                        f 0′ + f 0′  ∎
       in +-idempotency→0 (f 0′) idempotent
-               
+
     inversion-homomorphic : (x : A) → - (f x) ≡ f (- x)
     inversion-homomorphic x =
       let
