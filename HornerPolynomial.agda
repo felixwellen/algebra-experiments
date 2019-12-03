@@ -31,6 +31,8 @@ module HornerPolynomial (R : Set) {{ _ : ring-structure {R} }} where
   private
     X = ((const 1′) ·X+ 0′)
 
+  X-horner-form = X
+
   module _ (A : Type₀) (A-is-0-truncated : isOfHLevel 2 A) {{ _ : ring-structure {A} }}
                    {{ _ : algebra-structure R {A} }} where
     open algebra-structure {{...}}               

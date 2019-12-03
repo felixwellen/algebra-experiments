@@ -12,6 +12,7 @@ open ring-structure ring-structure-on-R
   renaming (_·_ to _·s_; _+_ to _+s_; -_ to -s_; 0′ to 0s; 1′ to 1s)
 
 data R[_] (I : Type₀) : Type₀ where
+  var : I → R[ I ]
   const : R → R[ I ]
   _+_ : R[ I ] → R[ I ] → R[ I ]
   -_ : R[ I ] → R[ I ]
@@ -58,8 +59,17 @@ module _ (I : Type₀) where
 
   is-algebra : algebra-structure R {R[ I ]}
   is-algebra = record
-                 { _⋆_ = _⋆_
-                 ; ⋆-associates-with-· = ⋆-associates-with-·
-                 ; ⋆-distributes-with-+ = ⋆-distributes-with-+
-                 ; 1-acts-trivial = 1-acts-trivial
-                 }
+               { _⋆_ = _⋆_
+               ; ⋆-associates-with-· = ⋆-associates-with-·
+               ; ⋆-distributes-with-+ = ⋆-distributes-with-+
+               ; 1-acts-trivial = 1-acts-trivial
+               }
+
+module free-structures (I : Type₀) where
+  instance
+    free-ring : ring-structure {R[ I ]}
+    free-ring = is-ring I
+
+  instance
+    free-algebra : algebra-structure R {R[ I ]}
+    free-algebra = is-algebra I 

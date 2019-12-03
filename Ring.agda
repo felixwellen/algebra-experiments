@@ -92,10 +92,10 @@ data ZeroRing : Set where
                      }
 
 
-module _ (R : Set) {{ _ : ring-structure {R} }} where
+module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
 
-  record algebra-structure {A : Set} {{ _ : ring-structure {A} }} : Set where
-    open ring-structure {{...}}
+  record algebra-structure {A : Set} ⦃ _ : ring-structure {A} ⦄ : Set where
+    open ring-structure ⦃...⦄
     field
       _⋆_ : R → A → A        -- \*
       ⋆-associates-with-· : (s t : R) (x : A) → s ⋆ (t ⋆ x) ≡ (s · t) ⋆ x
