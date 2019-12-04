@@ -10,13 +10,13 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Data.Nat.Base
 open import Cubical.Data.Nat.Order
 open import Cubical.Foundations.HLevels
-open import Basics
+open import Basics hiding (¬)
 
 module UpperNaturals where
 
 hProp₀ = hProp {ℓ-zero}
 
-_holds : hProp₀ → Type₀
+_holds : ∀ {ℓ} → hProp {ℓ} → Type ℓ
 (P , _) holds = P
 
 holds-is-prop : (P : hProp₀) → isProp (P holds)
@@ -49,3 +49,22 @@ upward-closed-is-a-prop N =
 
 ℕ↑-is-a-set : isSet ℕ↑
 ℕ↑-is-a-set = isOfHLevelΣ 2 ℕ→Prop₀-is-a-set (λ s  → hLevelSuc 1 _ (upward-closed-is-a-prop s))
+
+
+_is-an-upper-bound-of_ : ℕ → ℕ↑ → hProp₀
+n is-an-upper-bound-of M = (fst M) n
+
+_≤:↑_ : ℕ↑ → ℕ → hProp₀
+M ≤:↑ n = n is-an-upper-bound-of M
+
+≤p-is-upward-closed : {n : ℕ} → (n ≤p_) is-upward-closed
+≤p-is-upward-closed = λ n m z z₁ → ≤-trans z₁ z
+
+_^↑ : ℕ → ℕ↑
+n ^↑ = (n ≤p_) , ≤p-is-upward-closed
+
+
+-- 0 is bounded above by every number.
+O↑ : ℕ↑
+O↑ = 0 ^↑
+
