@@ -13,7 +13,7 @@ module _ (A : Type₀) (A-is-0-truncated : isOfHLevel 2 A) ⦃ _ : ring-structur
   open FreeAlgebra R
        hiding ()
        using (R[_])
-  open FreeAlgebra.free-structures I
+  open FreeAlgebra.free-structures R I
   open algebra-structure ⦃...⦄
   open ring-structure ⦃...⦄
 

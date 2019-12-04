@@ -8,11 +8,15 @@ open import Point
 open import Ring
 import FreeAlgebra
 import HornerPolynomial
+import PropertiesOfFreeAlgebra
 
 module Polynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
 
 open FreeAlgebra R
+open PropertiesOfFreeAlgebra R OnePointType
+  renaming (evaluate-at to free-evaluate-at)
 open HornerPolynomial R
+  renaming (evaluate-at to horner-evaluate-at)
 open ring-structure ⦃...⦄
 
 as-free-algebra : Type₀
@@ -26,5 +30,7 @@ as-horner-forms : Type₀
 as-horner-forms = R[X]
 
 horner-to-free : R[X] → as-free-algebra
-horner-to-free = evaluate-at as-free-algebra (λ x y → λ p q → R[_].is-0-truncated _ _ _ _) X-free
+horner-to-free = horner-evaluate-at
+                   as-free-algebra
+                   (λ x y → λ p q → R[_].is-0-truncated _ _ _ _) X-free
 
