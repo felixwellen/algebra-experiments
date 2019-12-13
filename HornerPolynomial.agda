@@ -20,7 +20,21 @@ module HornerPolynomial (R : Set) {{ _ : ring-structure {R} }} where
     _·X+_ : R[X] → R → R[X]
     const0-nullifies : (r : R) → const 0′ ·X+ r ≡ const r
     is-0-truncated : (x y : R[X]) (p q : x ≡ y) → p ≡ q
-    
+
+
+  _⋆ₕ_ : R → R[X] → R[X]
+  r ⋆ₕ const s = const (r · s)
+  r ⋆ₕ (P ·X+ s) = (r ⋆ₕ P) ·X+ (r · s)
+  r ⋆ₕ const0-nullifies s i =
+    let equality-to-prove : r ⋆ₕ (const 0′ ·X+ s) ≡ r ⋆ₕ const s
+        equality-to-prove = const (r · 0′) ·X+ (r · s)      ≡⟨ cong (λ u → const u ·X+ (r · s)) (·-is-commutative _ _) ⟩
+                            const (0′ · r) ·X+ (r · s)      ≡⟨ cong (λ u → const u ·X+ (r · s)) (0-nullifies′ _) ⟩
+                            const 0′ ·X+ (r · s)            ≡⟨ const0-nullifies _ ⟩
+                            const (r · s)                   ∎
+    in equality-to-prove i
+  r ⋆ₕ is-0-truncated P Q p q i j = is-0-truncated (r ⋆ₕ P) (r ⋆ₕ Q) (cong _ p) (cong _ q) i j
+
+  {- WRONG DEFINITION - this is not composition of polynomials -}
   _∘_ : R[X] → R[X] → R[X]
   const r ∘ g = const r
   (h ·X+ r) ∘ g = (h ∘ g) ·X+ r
