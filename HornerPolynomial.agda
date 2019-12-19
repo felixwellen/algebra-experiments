@@ -11,8 +11,8 @@ open import Cubical.Foundations.HLevels
 open import Cubical.Data.Nat.Base renaming (_+_ to _+ℕ_)
 open import Ring
 
-module HornerPolynomial (R : Type₀) {{ _ : ring-structure {R} }} where
-  open ring-structure {{...}}
+module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
+  open ring-structure ⦃...⦄
 
   infix 10 _·X+_
 
@@ -41,15 +41,16 @@ module HornerPolynomial (R : Type₀) {{ _ : ring-structure {R} }} where
   _+const_ : R[X] → R → R[X]
   const x +const r = const (x + r) 
   (P ·X+ x) +const r = P ·X+ (x + r)
-  const0-nullifies r i +const s = (const 0′ ·X+ (r + s) ≡⟨ const0-nullifies (r + s) ⟩ const (r + s) ∎) i
+  const0-nullifies r i +const s =(const 0′ ·X+ (r + s) ≡⟨ const0-nullifies (r + s) ⟩
+                                  const (r + s) ∎) i
   is-0-truncated P Q p q i j +const r = is-0-truncated (P +const r) (Q +const r) (cong _ p) (cong _ q) i j
 
 
-  lemma : ∀ P → P +const 0′ ≡ P
-  lemma (const x) = cong const (+-is-unital _)
-  lemma (P ·X+ x) = {!!}
-  lemma (const0-nullifies r i) = {!!}
-  lemma (is-0-truncated P P₁ p q i i₁) = {!!}
+  lemma+const0 : ∀ P → P +const 0′ ≡ P
+  lemma+const0 (const r) = cong const (+-is-unital _)
+  lemma+const0 (Q ·X+ r) = cong (Q ·X+_) (+-is-unital _)
+  lemma+const0 (const0-nullifies r i) = is-0-truncated _ _ {!!} {!!} i
+  lemma+const0 (is-0-truncated P Q p q i j) = {!!}
 {-  const r   +ₕ const s   = const (r + s)
   const r   +ₕ (P ·X+ s) = P ·X+ (r + s)
   (P ·X+ r) +ₕ const s   = P ·X+ (r + s)

@@ -5,7 +5,7 @@ open import Cubical.Foundations.HLevels
 open import Ring
 import FreeAlgebra
 
-module PropertiesOfFreeAlgebra (R : Type₀) {{ ring-structure-on-R : ring-structure {R} }}
+module PropertiesOfFreeAlgebra (R : Type₀) ⦃ ring-structure-on-R : ring-structure {R} ⦄
                                (I : Type₀) where
 
 module _ (A : Type₀) (A-is-0-truncated : isOfHLevel 2 A) ⦃ _ : ring-structure {A} ⦄
