@@ -46,98 +46,24 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
   is-0-truncated P Q p q i j +const r = is-0-truncated (P +const r) (Q +const r) (cong _ p) (cong _ q) i j
 
 
-  lemma+const0 : ∀ P → P +const 0′ ≡ P
-  lemma+const0 (const r) = cong const (+-is-unital _)
-  lemma+const0 (Q ·X+ r) = cong (Q ·X+_) (+-is-unital _)
-  lemma+const0 (const0-nullifies r i) = is-0-truncated _ _ {!!} {!!} i
-  lemma+const0 (is-0-truncated P Q p q i j) = {!!}
-{-  const r   +ₕ const s   = const (r + s)
-  const r   +ₕ (P ·X+ s) = P ·X+ (r + s)
-  (P ·X+ r) +ₕ const s   = P ·X+ (r + s)
-  (P ·X+ r) +ₕ (Q ·X+ s) = (P +ₕ Q) ·X+ (r + s)
-  const r +ₕ const0-nullifies s i   = (const 0′ ·X+ (r + s) ≡⟨ const0-nullifies (r + s) ⟩ const (r + s) ∎) i
-  const0-nullifies r i +ₕ (const s) = (const 0′ ·X+ (r + s) ≡⟨ const0-nullifies _ ⟩ const (r + s) ∎) i
-  const0-nullifies r i +ₕ (P ·X+ s) =
-    let to-prove : (const 0′ ·X+ r) +ₕ (P ·X+ s) ≡ const r +ₕ (P ·X+ s) 
-        to-prove = {!!}
-    in to-prove i
-  const0-nullifies r i +ₕ (const0-nullifies s j) =
-    let to-prove : (const 0′ ·X+ r) +ₕ (const0-nullifies s j) ≡ const r +ₕ (const0-nullifies s j)
-        to-prove = {!!}
-    in to-prove i
-  const0-nullifies r i +ₕ (is-0-truncated Q S p q j k) =
-    let to-prove : (const 0′ ·X+ r) +ₕ (is-0-truncated Q S p q j k) ≡ const r +ₕ (is-0-truncated Q S p q j k)
-        to-prove = {!!}
-    in to-prove i
-  ((const t) ·X+ r) +ₕ const0-nullifies s i =
-    let to-prove : (const (t + 0′)) ·X+ (r + s) ≡ (const t ·X+ (r + s))
-        to-prove = cong (λ u → const u ·X+ (r + s)) (+-is-unital _)
-    in to-prove i
-  ((P ·X+ t) ·X+ r) +ₕ const0-nullifies s i =
-    let to-prove : (P ·X+ (t + 0′)) ·X+ (r + s) ≡ (P ·X+ t) ·X+ (r + s)
-        to-prove = cong (λ u → (P ·X+ u) ·X+ (r + s)) (+-is-unital _)
-    in to-prove i
-  ((const0-nullifies t j) ·X+ r) +ₕ const0-nullifies s i =
-    let to-prove : (_ +ₕ const 0′) ·X+ (r + s) ≡ (_ ·X+ (r + s))
-        to-prove = {!!}
-    in to-prove i
-  ((is-0-truncated P Q p q j k) ·X+ r) +ₕ const0-nullifies s i =
-    let to-prove : (P +ₕ const 0′) ·X+ (r + s) ≡ (P ·X+ (r + s))
-        to-prove = {!!}
-    in to-prove i
-  const r +ₕ is-0-truncated Q S p q i j = is-0-truncated (const r +ₕ Q) (const r +ₕ S) (cong _ p) (cong _ q) i j
-  (P ·X+ r) +ₕ is-0-truncated Q S p q i j = {!!}
-  is-0-truncated P P₁ p q i i₁ +ₕ Q = {!!}
-
-  _·ₕ_ : R[X] → R[X] → R[X]
-  const r ·ₕ const s = const (r · s)
-  const r ·ₕ (Q ·X+ s) = const r ·ₕ Q ·X+ r · s
-  (P ·X+ r) ·ₕ const s = P ·ₕ const s ·X+ r · s
-  (P ·X+ r) ·ₕ (Q ·X+ s) = {!P ·ₕ Q ·X+ !}
-  (P ·X+ r) ·ₕ const0-nullifies r₁ i = {!!}
-  (P ·X+ r) ·ₕ is-0-truncated Q Q₁ p q i i₁ = {!!}
-  const r ·ₕ const0-nullifies s i = {!!}
-  const r ·ₕ is-0-truncated Q Q₁ p q i i₁ = {!!}
-  const0-nullifies r i ·ₕ Q = {!!}
-  is-0-truncated P P₁ p q i i₁ ·ₕ Q = {!!}
-
-  {- WRONG DEFINITION - this is not composition of polynomials -}
-  _∘_ : R[X] → R[X] → R[X]
-  const r ∘ g = const r
-  (h ·X+ r) ∘ g = ((h ∘ g) ·ₕ g) +ₕ const r
-  const0-nullifies r i ∘ g = {!!} -- const0-nullifies r i
-  is-0-truncated f f′ p q i j ∘ g =
-    is-0-truncated (f ∘ g) (f′ ∘ g) (cong (_∘ g) p) (cong (_∘ g) q) i j
--}
 
 
-
-
-{-
--}
-
-{-
   module _ (R-is-0-type : isOfHLevel 2 R) where 
-    -- P = ∑ aᵢ X^i  => coefficient i P = aᵢ
+    constant-coefficient : R[X] → R
+    constant-coefficient (const r) = r
+    constant-coefficient (P ·X+ r) = r
+    constant-coefficient (const0-nullifies r i) = ( r ≡⟨ refl ⟩ r ∎) i
+    constant-coefficient (is-0-truncated P Q p q i j) = R-is-0-type (constant-coefficient P) (constant-coefficient Q) (cong _ p) (cong _ q) i j
+
+    non-constant-part : R[X] → R[X]
+    non-constant-part (const r) = const 0′
+    non-constant-part (P ·X+ r) = P
+    non-constant-part (const0-nullifies r i) = (const 0′ ≡⟨ refl ⟩ const 0′ ∎) i
+    non-constant-part (is-0-truncated P Q p q i j) = is-0-truncated (non-constant-part P) (non-constant-part Q) (cong _ p) (cong _ q) i j
+
     coefficient : ℕ → R[X] → R
-    coefficient zero (const r) = r
-    coefficient (suc n) (const r) = 0′
-    coefficient zero (P ·X+ r) = r
-    coefficient (suc n) (P ·X+ r) = coefficient n P
-    coefficient 0 (const0-nullifies r i) = let eq-to-prove : coefficient 0 (const 0′ ·X+ r) ≡ coefficient 0 (const r)
-                                               eq-to-prove = coefficient 0 (const 0′ ·X+ r) ≡⟨ refl ⟩ 
-                                                             coefficient 0 (const r) ∎
-                                           in eq-to-prove i
-    coefficient (suc n) (const0-nullifies r i) = let compute-const-0 : (k : ℕ) → coefficient k (const 0′) ≡ 0′
-                                                     compute-const-0 = (λ { zero → refl ; (suc k′) → refl })
-{-                                                   eq-to-prove : _ ≡ _ -- coefficient (suc n) (const 0′ ·X+ r) ≡ coefficient (suc n) (const r)
-                                                     eq-to-prove = coefficient (suc n) (const 0′ ·X+ r)   ≡⟨ {!!} ⟩
-                                                                   coefficient n (const 0′)               ≡⟨ {!!} ⟩ 
-                                                                   0′                                     ≡⟨ {!!} ⟩ 
-                                                                   coefficient (suc n) (const r) ∎ -}
-                                                 in compute-const-0 n i
-    coefficient n (is-0-truncated P Q p q i j) = R-is-0-type (coefficient n P) (coefficient n Q) (cong _ p) (cong _ q) i j
--}
+    coefficient zero P = constant-coefficient P
+    coefficient (suc n) P = coefficient n (non-constant-part P)
 
   private
     X = ((const 1′) ·X+ 0′)
