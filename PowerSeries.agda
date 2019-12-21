@@ -1,44 +1,46 @@
-{-# OPTIONS --cubical --safe #-}
+{-# OPTIONS --cubical #-}
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Data.Nat.Base renaming (_+_ to _+ℕ_)
 open import Cubical.Data.Nat.Order
+open import Cubical.Data.Prod
+open import Cubical.Data.List.Base
 open import Ring
 -- open import List
 
-module PowerSeries (A : Set) {{ _ : ring-structure {A} }} where
-  open ring-structure {{...}}
+module PowerSeries (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
+  open ring-structure ⦃...⦄
 
-  data bounded-list (n : ℕ) : Type₀ where
-    [] : bounded-list n
-    _∷_ : (k : ℕ) → k ≤ n → bounded-list n → bounded-list n
+  seq = ℕ → R
 
-  ℕ≤ : (n : ℕ) → Type₀
-  ℕ≤ n = Σ[ k ∈ ℕ ] k ≤ n
+  _+ₚ_ : seq → seq → seq
+  a +ₚ b = λ n → a n + b n
 
-  _-ℕ_ : (n : ℕ) → ℕ≤ n → ℕ
-  n -ℕ (k , k≤n) = {!!}
+  _⋆ₚ_ : R → seq → seq
+  r ⋆ₚ a = λ n → r · (a n)
 
-
-  seq =  ℕ → A
-{-
-  [0,⋯,_] : ℕ → list ℕ
+  [0,⋯,_] : ℕ → List ℕ
   [0,⋯, zero ] = [ zero ]
-  [0,⋯, suc l ] =  [0,⋯, l ] ⊕ [ suc l ]
+  [0,⋯, suc l ] =  [0,⋯, l ] ++ [ suc l ]
 
-  ∑ : list A → A
+  zip : ∀ {A B : Type₀} → List A → List B → List (A × B)
+  zip [] _ = []
+  zip _ [] = []
+  zip (x ∷ l) (y ∷ l′) = (x , y) ∷ zip l l′
+
+  indices-for-cauchy-product : ℕ → List (ℕ × ℕ)
+  indices-for-cauchy-product n = zip [0,⋯, n ] (rev [0,⋯, n ])
+
+  ∑ : List R → R
   ∑ [] = 0′
   ∑ (x ∷ l) = x + (∑ l)
-  
-  cauchy-product : seq → seq → seq
-  cauchy-product a b n = ∑ [ (a i)·(b {!n - i!}) ∣ i ∈ [0,⋯, n ] ]
--}
-{-
 
-  take_from_ : ℕ → seq → list A
-  take zero from s = []
-  take succ k from s = (s zero) ∷ (take k from (shift-by-one s)) 
+  map : {A B : Type₀} → (A → B) → List A → List B
+  map f [] = []
+  map f (x ∷ l) = f x ∷ map f l
 
+  _·ₚ_ : seq → seq → seq
+  a ·ₚ b = λ n → ∑ (map (λ {(k , l) → a k · b l}) (indices-for-cauchy-product n) )
 
   is-ring : ring-structure {seq}
   is-ring = record
@@ -49,12 +51,12 @@ module PowerSeries (A : Set) {{ _ : ring-structure {A} }} where
               ; +-is-unital = λ a → funExt (λ n → +-is-unital _)
               ; +-is-commutative = λ a b → funExt (λ _ → +-is-commutative _ _)
               ; +-has-inverses = λ a → funExt (λ _ → +-has-inverses _)
-              ; _·_ = {!!}
-              ; 1′ = {!!}
+              ; _·_ = _·ₚ_
+              ; 1′ = λ n → 1′
               ; ·-is-associative = {!!}
               ; ·-is-unital = {!!}
               ; ·-is-commutative = {!!}
               ; distributive = {!!}
               }
   
--}
+
