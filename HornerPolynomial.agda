@@ -45,21 +45,21 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
                                   const (r + s) ∎) i
   is-0-truncated P Q p q i j +const r = is-0-truncated (P +const r) (Q +const r) (cong _ p) (cong _ q) i j
 
-
-
-
   module _ (R-is-0-type : isOfHLevel 2 R) where 
     constant-coefficient : R[X] → R
     constant-coefficient (const r) = r
     constant-coefficient (P ·X+ r) = r
     constant-coefficient (const0-nullifies r i) = ( r ≡⟨ refl ⟩ r ∎) i
-    constant-coefficient (is-0-truncated P Q p q i j) = R-is-0-type (constant-coefficient P) (constant-coefficient Q) (cong _ p) (cong _ q) i j
+    constant-coefficient (is-0-truncated P Q p q i j) =
+      R-is-0-type (constant-coefficient P) (constant-coefficient Q)
+                  (cong _ p) (cong _ q) i j
 
     non-constant-part : R[X] → R[X]
     non-constant-part (const r) = const 0′
     non-constant-part (P ·X+ r) = P
     non-constant-part (const0-nullifies r i) = (const 0′ ≡⟨ refl ⟩ const 0′ ∎) i
-    non-constant-part (is-0-truncated P Q p q i j) = is-0-truncated (non-constant-part P) (non-constant-part Q) (cong _ p) (cong _ q) i j
+    non-constant-part (is-0-truncated P Q p q i j) =
+      is-0-truncated (non-constant-part P) (non-constant-part Q) (cong _ p) (cong _ q) i j
 
     coefficient : ℕ → R[X] → R
     coefficient zero P = constant-coefficient P
