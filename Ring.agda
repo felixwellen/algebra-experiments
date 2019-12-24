@@ -71,6 +71,11 @@ record ring-structure {A : Set} : Set where
                    x + 0′    ≡⟨ +-is-unital _ ⟩
                    x        ∎
 
+  ·-is-unital′ : (x : A) →  x · 1′ ≡ x
+  ·-is-unital′ x = x · 1′  ≡⟨ ·-is-commutative _ _ ⟩
+                   1′ · x  ≡⟨ ·-is-unital _ ⟩
+                   x       ∎
+  
 data ZeroRing : Set where
   0″ : ZeroRing
 
