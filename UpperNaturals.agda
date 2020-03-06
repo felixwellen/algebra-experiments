@@ -14,14 +14,6 @@ open import Basics hiding (¬_)
 
 module UpperNaturals where
 
-hProp₀ = hProp ℓ-zero
-
-_holds : ∀ {ℓ} → hProp ℓ → Type ℓ
-(P , _) holds = P
-
-holds-is-prop : (P : hProp₀) → isProp (P holds)
-holds-is-prop (_ , is-prop) = is-prop
-
 -- A propositional version of _≤_
 _≤p_ : ℕ → ℕ → hProp₀
 n ≤p m = (n ≤ m) , m≤n-isProp

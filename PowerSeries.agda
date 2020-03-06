@@ -6,8 +6,8 @@ open import Cubical.Data.Nat.Order
 open import Ring
 -- open import List
 
-module PowerSeries (A : Set) {{ _ : ring-structure {A} }} where
-  open ring-structure {{...}}
+module PowerSeries (A : Set) ⦃ _ : ring-structure {A} ⦄ where
+  open ring-structure ⦃...⦄
 
   data bounded-list (n : ℕ) : Type₀ where
     [] : bounded-list n
