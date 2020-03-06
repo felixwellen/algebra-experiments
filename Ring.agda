@@ -4,6 +4,22 @@ open import Cubical.Foundations.Prelude
 
 module Ring where
 
+record ring-operations {A : Type₀} : Type₀ where
+  field
+    _+_ : A → A → A
+    -_ : A → A
+    0′ : A                    -- 0\'
+    _·_ : A → A → A            -- \cdot
+    1′ : A                     -- 1\'
+
+record is-ideal {A : Type₀} (I : A → Type₀) ⦃ operations : ring-operations {A} ⦄ : Type₀ where
+  open ring-operations operations
+  field
+    +-closed : {x y : A} (_ : I(x)) (_ : I(y)) → I(x + y)
+    -closed : {x : A} (_ : I(x)) → I(- x)
+    0′-closed : I(0′)
+    ·-closed : {r x : A} (_ : I(x)) → I(r · x)
+
 record ring-structure {A : Set} : Set where
   field
     _+_ : A → A → A
@@ -91,6 +107,30 @@ data ZeroRing : Set where
                      ; distributive = λ _ _ _ → refl
                      }
 
+
+forget-ring-relations : {A : Type₀} (ring-structure : ring-structure {A} ) → ring-operations {A}
+forget-ring-relations
+  record {
+    _+_ = _+_ ;
+    -_ = -_ ;
+    0′ = 0′ ;
+    +-is-associative = +-is-associative ;
+    +-is-unital = +-is-unital ;
+    +-is-commutative = +-is-commutative ;
+    +-has-inverses = +-has-inverses ;
+    _·_ = _·_ ;
+    1′ = 1′ ;
+    ·-is-associative = ·-is-associative ;
+    ·-is-unital = ·-is-unital ;
+    ·-is-commutative = ·-is-commutative ;
+    distributive = distributive } = record {
+                                           _+_ = _+_ ;
+                                           -_ = -_ ;
+                                           0′ = 0′ ;
+                                           _·_ = _·_ ;
+                                           1′ = 1′ }
+
+-- is-ideal : {A : Type₀} (I : A → Type₀)
 
 module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
 

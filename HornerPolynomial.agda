@@ -22,6 +22,11 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
     const0-nullifies : (r : R) → const 0′ ·X+ r ≡ const r
     is-0-truncated : (x y : R[X]) (p q : x ≡ y) → p ≡ q
 
+  data R[X]ₗ : Type₀ where
+    [_] : R → R[X]ₗ
+    _∷_ : R → R[X]ₗ → R[X]ₗ
+    test : (l : R[X]ₗ) → 0′ ∷ l ≡ l
+
 
   _⋆ₕ_ : R → R[X] → R[X]
   r ⋆ₕ const s = const (r · s)
@@ -45,26 +50,26 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
                                   const (r + s) ∎) i
   is-0-truncated P Q p q i j +const r = is-0-truncated (P +const r) (Q +const r) (cong _ p) (cong _ q) i j
 
-
-
-
   module _ (R-is-0-type : isOfHLevel 2 R) where 
     constant-coefficient : R[X] → R
     constant-coefficient (const r) = r
     constant-coefficient (P ·X+ r) = r
     constant-coefficient (const0-nullifies r i) = ( r ≡⟨ refl ⟩ r ∎) i
-    constant-coefficient (is-0-truncated P Q p q i j) = R-is-0-type (constant-coefficient P) (constant-coefficient Q) (cong _ p) (cong _ q) i j
+    constant-coefficient (is-0-truncated P Q p q i j) =
+      R-is-0-type (constant-coefficient P) (constant-coefficient Q) (cong _ p) (cong _ q) i j
+
+    constant-part = constant-coefficient
 
     non-constant-part : R[X] → R[X]
     non-constant-part (const r) = const 0′
     non-constant-part (P ·X+ r) = P
     non-constant-part (const0-nullifies r i) = (const 0′ ≡⟨ refl ⟩ const 0′ ∎) i
-    non-constant-part (is-0-truncated P Q p q i j) = is-0-truncated (non-constant-part P) (non-constant-part Q) (cong _ p) (cong _ q) i j
+    non-constant-part (is-0-truncated P Q p q i j) = is-0-truncated
+      (non-constant-part P) (non-constant-part Q) (cong _ p) (cong _ q) i j
 
     coefficient : ℕ → R[X] → R
     coefficient zero P = constant-coefficient P
     coefficient (suc n) P = coefficient n (non-constant-part P)
-
   private
     X = ((const 1′) ·X+ 0′)
 
@@ -89,3 +94,19 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
 
     image-of-X : (R[X] → A) → A
     image-of-X f = f X
+
+
+{-
+
+    _+ₕ_ : R[X] → R[X] → R[X]
+    const r              +ₕ const s = const (r + s)
+    (P ·X+ r)            +ₕ const s = P ·X+ (r + s)
+    const0-nullifies r i +ₕ const s = {!!}
+    const r              +ₕ (Q ·X+ s) = Q ·X+ (r + s)
+    (P ·X+ r)            +ₕ (Q ·X+ s) = (P +ₕ Q) ·X+ (r + s)
+    const0-nullifies r i +ₕ (Q ·X+ x) = {!!}
+    P                    +ₕ const0-nullifies r i = {!!}
+    P +ₕ is-0-truncated Q S p q i j = {!!}
+    is-0-truncated P Q p q i j +ₕ const r = {!is-0-truncated P _ p q !}
+    is-0-truncated P Q p q i j +ₕ (S ·X+ s) = {!!}
+-}
