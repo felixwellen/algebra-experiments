@@ -22,11 +22,6 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
     const0-nullifies : (r : R) → const 0′ ·X+ r ≡ const r
     is-0-truncated : (x y : R[X]) (p q : x ≡ y) → p ≡ q
 
-  data R[X]ₗ : Type₀ where
-    [_] : R → R[X]ₗ
-    _∷_ : R → R[X]ₗ → R[X]ₗ
-    test : (l : R[X]ₗ) → 0′ ∷ l ≡ l
-
 
   _⋆ₕ_ : R → R[X] → R[X]
   r ⋆ₕ const s = const (r · s)
@@ -96,17 +91,3 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
     image-of-X f = f X
 
 
-{-
-
-    _+ₕ_ : R[X] → R[X] → R[X]
-    const r              +ₕ const s = const (r + s)
-    (P ·X+ r)            +ₕ const s = P ·X+ (r + s)
-    const0-nullifies r i +ₕ const s = {!!}
-    const r              +ₕ (Q ·X+ s) = Q ·X+ (r + s)
-    (P ·X+ r)            +ₕ (Q ·X+ s) = (P +ₕ Q) ·X+ (r + s)
-    const0-nullifies r i +ₕ (Q ·X+ x) = {!!}
-    P                    +ₕ const0-nullifies r i = {!!}
-    P +ₕ is-0-truncated Q S p q i j = {!!}
-    is-0-truncated P Q p q i j +ₕ const r = {!is-0-truncated P _ p q !}
-    is-0-truncated P Q p q i j +ₕ (S ·X+ s) = {!!}
--}

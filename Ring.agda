@@ -1,11 +1,10 @@
 {-# OPTIONS --cubical --safe #-}
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.HLevels
 open import Basics
-open import AbelianGroup
 
 module Ring where
-
 
 record ring-structure {A : Type₀} : Type₀ where
   field
@@ -74,6 +73,35 @@ record ring-structure {A : Type₀} : Type₀ where
                    x + 0′    ≡⟨ +-is-unital _ ⟩
                    x        ∎
 
+  +-is-associative′ : (x y z : A) → (x + y) + z ≡ x + (y + z)
+  +-is-associative′ x y z = sym (+-is-associative x y z) 
+
+  isInverseTo- : (x y : A)
+                 → x + y ≡ 0′
+                 → y ≡ - x
+  isInverseTo- x y p = y               ≡⟨ sym (+-is-unital′ y) ⟩
+                       0′ + y          ≡⟨ cong (λ u → u + y)
+                                               (sym (+-has-inverses′ x)) ⟩
+                       (- x + x) + y   ≡⟨ +-is-associative′ _ _ _ ⟩
+                       (- x) + (x + y) ≡⟨ cong (λ u → (- x) + u) p ⟩
+                       (- x) + 0′      ≡⟨ +-is-unital _ ⟩
+                       - x             ∎ 
+  
+  -isDistributive : (x y : A) →  (- x) + (- y) ≡ - (x + y)
+  -isDistributive x y =
+    isInverseTo- _ _
+          (x + y + ((- x) + (- y))  ≡⟨ +-is-associative′ _ _ _ ⟩
+          x + (y + ((- x) + (- y))) ≡⟨ cong
+                                       (λ u → x + (y + u))
+                                       (+-is-commutative (- x) (- y )) ⟩
+          x + (y + ((- y) + (- x))) ≡⟨ cong (λ u → x + u) (+-is-associative _ _ _) ⟩
+          x + ((y + (- y)) + (- x)) ≡⟨ cong (λ u → x + (u + (- x)))
+                                            (+-has-inverses _) ⟩
+          x + (0′ + (- x))          ≡⟨ cong (λ u → x + u) (+-is-unital′ _) ⟩
+          x + (- x)                 ≡⟨ +-has-inverses _ ⟩
+          0′ ∎)
+  
+  
 data ZeroRing : Set where
   0″ : ZeroRing
 
@@ -93,8 +121,6 @@ data ZeroRing : Set where
                      ; ·-is-commutative = λ _ _ → refl
                      ; distributive = λ _ _ _ → refl
                      }
-
-
 
 module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
 
@@ -117,7 +143,6 @@ module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
                           0′ ⋆ x + 0′ ⋆ x  ∎
                     in +-idempotency→0 _ 0x-is-idempotent
 
-
   trivial-algebra-structure : algebra-structure
   trivial-algebra-structure =
     let open ring-structure {{...}}
@@ -129,8 +154,8 @@ module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
        }
 
   record _-algebra-homomorphism-structure
-          {A : Set} {{ _ : ring-structure {A} }} {{ _ : algebra-structure {A} }} 
-          {B : Set} {{ _ : ring-structure {B} }} {{ _ : algebra-structure {B} }}
+          {A : Set} ⦃ _ : ring-structure {A} ⦄ ⦃ _ : algebra-structure {A} ⦄
+          {B : Set} ⦃ _ : ring-structure {B} ⦄ ⦃ _ : algebra-structure {B} ⦄
           (f : A → B) : Set where
     open ring-structure {{...}}
     open algebra-structure {{...}}
@@ -161,44 +186,3 @@ module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
          0′ + f (- x)            ≡⟨ +-is-unital′ _ ⟩
          f (- x)                 ∎
 
-module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
-  open ring-structure ⦃...⦄
-  record is-ideal (I : R → hProp₀) : Type₀ where
-    field
-      +-closed : {x y : R} (_ : I(x) holds) (_ : I(y) holds) → I(x + y) holds
-      -closed : {x : R} (_ : I(x) holds) → I(- x) holds
-      0′-closed : I(0′) holds
-      ·-closed : {r x : R} (_ : I(x) holds) → I(r · x) holds
-
-    I′ : Type₀
-    I′ = Σₛ I
-
-    _+′_ : I′ → I′ → I′
-    (x , p) +′ (y , q) = (x + y , +-closed p q)
-
-    +-is-associative′ : (x y z : I′) → x +′ (y +′ z) ≡ (x +′ y) +′ z
-    +-is-associative′ (x , p) (y , q) (z , r) =
-                      subtypeEqual′ {P = I}
-                        ((x , p) +′ ((y , q) +′ (z , r)))
-                        (((x , p) +′ (y , q)) +′ (z , r))
-                        (+-is-associative x y z)
-
-    is-abelian-group : abelian-group-structure {I′}
-    is-abelian-group = record
-                         { _+_ = _+′_
-                         ; -_ = λ {(x , p) → (- x) , -closed p}
-                         ; 0′ = 0′ , 0′-closed
-                         ; +-is-associative = +-is-associative′
-                         ; +-is-unital = λ {(x , _) → subtypeEqual′ {P = I} _ _ (+-is-unital x)}
-                         ; +-is-commutative = λ {(x , _) (y , _)
-                                                → subtypeEqual′ {P = I} _ _ (+-is-commutative x y)}
-                         ; +-has-inverses = λ {(x , _)
-                                            →  subtypeEqual′ {P = I} _ _ (+-has-inverses x) }
-                         }
-
-  data QuotientRing (I : R → hProp₀) (isIdeal : is-ideal I) : Type₀ where
-    proj : R → QuotientRing I isIdeal
-    mod : (r : R) (m : Σₛ I) → proj r ≡ proj (r + fst m)
-    is0truncated : (x y : QuotientRing I isIdeal) (p q : x ≡ y) → p ≡ q
-
-  
