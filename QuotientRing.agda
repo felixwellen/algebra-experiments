@@ -24,13 +24,10 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
 
     _+′_ : I′ → I′ → I′
     (x , p) +′ (y , q) = (x + y , +-closed p q)
-
+{-
     +-is-associative-I : (x y z : I′) → x +′ (y +′ z) ≡ (x +′ y) +′ z
-    +-is-associative-I (x , p) (y , q) (z , r) =
-                      subtypeEqual′ {P = I}
-                        ((x , p) +′ ((y , q) +′ (z , r)))
-                        (((x , p) +′ (y , q)) +′ (z , r))
-                        (+-is-associative x y z)
+    +-is-associative-I (x , p) (y , q) (z , r) = {!!}
+                      
 
     is-abelian-group : abelian-group-structure {I′}
     is-abelian-group = record
@@ -38,14 +35,14 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
                          ; -_ = λ {(x , p) → (- x) , -closed p}
                          ; 0′ = 0′ , 0′-closed
                          ; +-is-associative = +-is-associative-I
-                         ; +-is-unital = λ {(x , _) → subtypeEqual′ {P = I} _ _ (+-is-unital x)}
+                         ; +-is-unital = λ {(x , _) → {!!}}
                          ; +-is-commutative = λ {(x , _) (y , _)
-                                                → subtypeEqual′ {P = I} _ _ (+-is-commutative x y)}
+                                                → {!!}}
                          ; +-has-inverses = λ {(x , _)
-                                            →  subtypeEqual′ {P = I} _ _ (+-has-inverses x) }
+                                            →  {!!}}
                          }
 
-
+-}
   mod-syntax : ∀ {ℓ ℓ'} {A : Type ℓ} (R : A → A → Type ℓ') (x y : A / R) → Type (ℓ-max ℓ ℓ') 
   mod-syntax {A = A} R = PathP (λ i → A / R)
 
@@ -62,14 +59,25 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
     homogenity : (x a b : R) (_ : differenceIsInIdeal a b)
                  → differenceIsInIdeal (x + a) (x + b)
     homogenity x a b p = subst (λ u → I(u) holds) calculation p
-      where calculation = a - b               ≡⟨ {!!} ⟩
-                          ((x + a) - (x + b)) ∎
+      where calculation =
+              a - b                       ≡⟨ cong (λ u → a + u)
+                                                  (sym (+-is-unital′ _)) ⟩
+              (a + (0′ + (- b)))          ≡⟨ cong (λ u → a + (u + (- b)))
+                                                  (sym (+-has-inverses _)) ⟩
+              (a + ((x + (- x)) + (- b))) ≡⟨ cong (λ u → a + u)
+                                                  (+-is-associative′ _ _ _) ⟩
+              (a + (x + ((- x) + (- b)))) ≡⟨ sym (+-is-associative′ _ _ _) ⟩
+              ((a + x) + ((- x) + (- b))) ≡⟨ cong (λ u → u + ((- x) + (- b)))
+                                                  (+-is-commutative _ _) ⟩
+              ((x + a) + ((- x) + (- b))) ≡⟨ cong (λ u → (x + a) + u)
+                                                  (-isDistributive _ _) ⟩
+              ((x + a) - (x + b)) ∎
       
     translate : R → Q → Q
     translate x = elim (λ r → squash/)
                        (λ y → [ x + y ])
                        λ y y' diffrenceInIdeal → eq/ (x + y) (x + y') (homogenity x y y' diffrenceInIdeal)
-
+{-
     homogenity' : (x x' : R) (_ : differenceIsInIdeal x x')
                   → translate x ≡ translate x'
     homogenity' x x' differenceInIdeal =
@@ -91,4 +99,4 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
              (λ r → isOfHLevelPi 2 λ _ → squash/)
              translate
              homogenity'
-
+-}
