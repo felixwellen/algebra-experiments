@@ -14,14 +14,6 @@ open import Basics hiding (¬_)
 
 module UpperNaturals where
 
-hProp₀ = hProp {ℓ-zero}
-
-_holds : ∀ {ℓ} → hProp {ℓ} → Type ℓ
-(P , _) holds = P
-
-holds-is-prop : (P : hProp₀) → isProp (P holds)
-holds-is-prop (_ , is-prop) = is-prop
-
 -- A propositional version of _≤_
 _≤p_ : ℕ → ℕ → hProp₀
 n ≤p m = (n ≤ m) , m≤n-isProp
@@ -74,7 +66,7 @@ false = Empty , λ {()}
 Empty-is-hProp : isOfHLevel 1 Empty
 Empty-is-hProp = λ {()}
 
-¬ : ∀ {ℓ} → hProp {ℓ} → hProp {ℓ}
+¬ : ∀ {ℓ} → hProp ℓ → hProp ℓ
 ¬ (P , isProp-P) = (P → Empty) , propPi (λ _ → Empty-is-hProp)
 
 -- Infinity is defined to be the number with no upper bounds.

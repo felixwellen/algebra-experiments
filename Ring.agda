@@ -1,10 +1,12 @@
-{-# OPTIONS --cubical --safe #-}
+{-# OPTIONS --cubical --safe  #-}
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.HLevels
+open import Basics
 
 module Ring where
 
-record ring-structure {A : Set} : Set where
+record ring-structure {A : Type₀} : Type₀ where
   field
     _+_ : A → A → A
     -_ : A → A
@@ -71,6 +73,35 @@ record ring-structure {A : Set} : Set where
                    x + 0′    ≡⟨ +-is-unital _ ⟩
                    x        ∎
 
+  +-is-associative′ : (x y z : A) → (x + y) + z ≡ x + (y + z)
+  +-is-associative′ x y z = sym (+-is-associative x y z) 
+
+  isInverseTo- : (x y : A)
+                 → x + y ≡ 0′
+                 → y ≡ - x
+  isInverseTo- x y p = y               ≡⟨ sym (+-is-unital′ y) ⟩
+                       0′ + y          ≡⟨ cong (λ u → u + y)
+                                               (sym (+-has-inverses′ x)) ⟩
+                       (- x + x) + y   ≡⟨ +-is-associative′ _ _ _ ⟩
+                       (- x) + (x + y) ≡⟨ cong (λ u → (- x) + u) p ⟩
+                       (- x) + 0′      ≡⟨ +-is-unital _ ⟩
+                       - x             ∎ 
+  
+  -isDistributive : (x y : A) →  (- x) + (- y) ≡ - (x + y)
+  -isDistributive x y =
+    isInverseTo- _ _
+          (x + y + ((- x) + (- y))  ≡⟨ +-is-associative′ _ _ _ ⟩
+          x + (y + ((- x) + (- y))) ≡⟨ cong
+                                       (λ u → x + (y + u))
+                                       (+-is-commutative (- x) (- y )) ⟩
+          x + (y + ((- y) + (- x))) ≡⟨ cong (λ u → x + u) (+-is-associative _ _ _) ⟩
+          x + ((y + (- y)) + (- x)) ≡⟨ cong (λ u → x + (u + (- x)))
+                                            (+-has-inverses _) ⟩
+          x + (0′ + (- x))          ≡⟨ cong (λ u → x + u) (+-is-unital′ _) ⟩
+          x + (- x)                 ≡⟨ +-has-inverses _ ⟩
+          0′ ∎)
+  
+  
 data ZeroRing : Set where
   0″ : ZeroRing
 
@@ -90,7 +121,6 @@ data ZeroRing : Set where
                      ; ·-is-commutative = λ _ _ → refl
                      ; distributive = λ _ _ _ → refl
                      }
-
 
 module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
 
@@ -113,7 +143,6 @@ module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
                           0′ ⋆ x + 0′ ⋆ x  ∎
                     in +-idempotency→0 _ 0x-is-idempotent
 
-
   trivial-algebra-structure : algebra-structure
   trivial-algebra-structure =
     let open ring-structure {{...}}
@@ -125,8 +154,8 @@ module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
        }
 
   record _-algebra-homomorphism-structure
-          {A : Set} {{ _ : ring-structure {A} }} {{ _ : algebra-structure {A} }} 
-          {B : Set} {{ _ : ring-structure {B} }} {{ _ : algebra-structure {B} }}
+          {A : Set} ⦃ _ : ring-structure {A} ⦄ ⦃ _ : algebra-structure {A} ⦄
+          {B : Set} ⦃ _ : ring-structure {B} ⦄ ⦃ _ : algebra-structure {B} ⦄
           (f : A → B) : Set where
     open ring-structure {{...}}
     open algebra-structure {{...}}
@@ -156,3 +185,4 @@ module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
          (- f x + f x) + f (- x) ≡⟨ cong (λ u → u + f (- x)) (+-has-inverses′ _) ⟩
          0′ + f (- x)            ≡⟨ +-is-unital′ _ ⟩
          f (- x)                 ∎
+

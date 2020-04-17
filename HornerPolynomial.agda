@@ -53,6 +53,8 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
     constant-coefficient (is-0-truncated P Q p q i j) =
       R-is-0-type (constant-coefficient P) (constant-coefficient Q)
                   (cong _ p) (cong _ q) i j
+                  
+    constant-part = constant-coefficient
 
     non-constant-part : R[X] → R[X]
     non-constant-part (const r) = const 0′
@@ -64,7 +66,6 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
     coefficient : ℕ → R[X] → R
     coefficient zero P = constant-coefficient P
     coefficient (suc n) P = coefficient n (non-constant-part P)
-
   private
     X = ((const 1′) ·X+ 0′)
 
@@ -89,3 +90,5 @@ module HornerPolynomial (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
 
     image-of-X : (R[X] → A) → A
     image-of-X f = f X
+
+
