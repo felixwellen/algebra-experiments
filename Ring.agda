@@ -123,7 +123,6 @@ data ZeroRing : Set where
                      }
 
 module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
-
   record algebra-structure {A : Set} ⦃ _ : ring-structure {A} ⦄ : Set where
     open ring-structure ⦃...⦄
     field
@@ -153,7 +152,7 @@ module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
          ; 1-acts-trivial = ·-is-unital
        }
 
-  record _-algebra-homomorphism-structure
+  record algebra-homomorphism-structure
           {A : Set} ⦃ _ : ring-structure {A} ⦄ ⦃ _ : algebra-structure {A} ⦄
           {B : Set} ⦃ _ : ring-structure {B} ⦄ ⦃ _ : algebra-structure {B} ⦄
           (f : A → B) : Set where
@@ -186,3 +185,18 @@ module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
          0′ + f (- x)            ≡⟨ +-is-unital′ _ ⟩
          f (- x)                 ∎
 
+  
+  hom : (A : Type₀) → (B : Type₀)
+    → ⦃ _ : ring-structure {A} ⦄ ⦃ _ : algebra-structure {A} ⦄
+    → ⦃ _ : ring-structure {B} ⦄ ⦃ _ : algebra-structure {B} ⦄
+    → Type₀
+  hom A B = Σ[ f ∈ (A → B) ] algebra-homomorphism-structure f  
+
+  module _ (A : Type₀) ⦃ _ : ring-structure {A} ⦄ ⦃ _ : algebra-structure {A} ⦄ where
+    id-homomorphism : hom A A
+    id-homomorphism = (λ x → x) , record
+                                    { ·-homomorphic = λ x y → refl
+                                    ; +-homomorphic = λ x y → refl
+                                    ; ·-unital = refl
+                                    ; ⋆-homomorphic = λ s x → refl
+                                    }
