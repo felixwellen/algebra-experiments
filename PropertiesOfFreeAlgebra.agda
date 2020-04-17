@@ -2,7 +2,8 @@
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.HLevels
-open import Cubical.Core.Everything
+open import Cubical.Foundations.Equiv
+open import Cubical.Foundations.Isomorphism
 open import Ring
 import FreeAlgebra
 
@@ -61,4 +62,10 @@ module _ (A : Type₀) (A-is-0-truncated : isOfHLevel 2 A) ⦃ _ : ring-structur
   evaluate-as-homomorphism φ = (evaluate-at φ) , (evaluation-is-homomorphic φ)
 
   universal-property : isEquiv evaluate-as-homomorphism
-  universal-property = {!!}
+  universal-property = isoToIsEquiv (iso evaluate-as-homomorphism
+                                         evaluate-on-variables
+                                         {!!}
+                                         {!!}) 
+                       where
+                         evaluate-on-variables : (hom R (R[ I ]) A) → (I → A)
+                         evaluate-on-variables ψ = (λ x → fst ψ (R[_].var x))
