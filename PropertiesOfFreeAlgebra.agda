@@ -2,6 +2,7 @@
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.HLevels
+open import Cubical.Core.Everything
 open import Ring
 import FreeAlgebra
 
@@ -50,12 +51,14 @@ module _ (A : Type₀) (A-is-0-truncated : isOfHLevel 2 A) ⦃ _ : ring-structur
   evaluation-is-homomorphic : ∀ (φ : I → A)
     →  algebra-homomorphism-structure R (evaluate-at φ)
   evaluation-is-homomorphic φ = record
-                                  { ·-homomorphic = {!!}
-                                  ; +-homomorphic = {!!}
-                                  ; ·-unital = {!!}
-                                  ; ⋆-homomorphic = {!!}
+                                  { ·-homomorphic = λ x y → refl
+                                  ; +-homomorphic = λ x y → refl
+                                  ; ·-unital = refl
+                                  ; ⋆-homomorphic = λ s x → refl
                                   }
 
-  evaluate-as-homomorphism : (I → A) → (hom (R[ I ]) A)
-  evaluate-as-homomorphism φ = ?
-  
+  evaluate-as-homomorphism : (I → A) → (hom R (R[ I ]) A)
+  evaluate-as-homomorphism φ = (evaluate-at φ) , (evaluation-is-homomorphic φ)
+
+  universal-property : isEquiv evaluate-as-homomorphism
+  universal-property = {!!}
