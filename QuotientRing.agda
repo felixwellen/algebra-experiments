@@ -12,52 +12,25 @@ module QuotientRing where
 
 module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
   open ring-structure ⦃...⦄
+
+  infix 5 _∈_
+  _∈_ : {X : Type₀} → (x : X) → (P : X → hProp₀) → Type₀
+  x ∈ P = P(x) holds
+
   record is-ideal (I : R → hProp₀) : Type₀ where
     field
-      +-closed : {x y : R} (_ : I(x) holds) (_ : I(y) holds) → I(x + y) holds
-      -closed : {x : R} (_ : I(x) holds) → I(- x) holds
-      0′-closed : I(0′) holds
-      ·-closed : {r x : R} (_ : I(x) holds) → I(r · x) holds
-
-    I′ : Type₀
-    I′ = Σₛ I
-
-    _+′_ : I′ → I′ → I′
-    (x , p) +′ (y , q) = (x + y , +-closed p q)
-{-
-    +-is-associative-I : (x y z : I′) → x +′ (y +′ z) ≡ (x +′ y) +′ z
-    +-is-associative-I (x , p) (y , q) (z , r) = {!!}
-                      
-
-    is-abelian-group : abelian-group-structure {I′}
-    is-abelian-group = record
-                         { _+_ = _+′_
-                         ; -_ = λ {(x , p) → (- x) , -closed p}
-                         ; 0′ = 0′ , 0′-closed
-                         ; +-is-associative = +-is-associative-I
-                         ; +-is-unital = λ {(x , _) → {!!}}
-                         ; +-is-commutative = λ {(x , _) (y , _)
-                                                → {!!}}
-                         ; +-has-inverses = λ {(x , _)
-                                            →  {!!}}
-                         }
-
--}
-  mod-syntax : ∀ {ℓ ℓ'} {A : Type ℓ} (R : A → A → Type ℓ') (x y : A / R) → Type (ℓ-max ℓ ℓ') 
-  mod-syntax {A = A} R = PathP (λ i → A / R)
-
-  syntax mod-syntax R x y = x ≡ y mod R
+      +-closed : {x y : R} → x ∈ I → y ∈ I → x + y ∈ I
+      -closed : {x : R} → x ∈ I → - x ∈ I
+      0′-closed : 0′ ∈ I
+      ·-closed : {r x : R} → x ∈ I → r · x ∈ I
   
   module _ (I : R → hProp₀) (isIdeal : is-ideal I) where
-    differenceIsInIdeal : R → R → Type₀
-    differenceIsInIdeal x y = I(x - y) holds
+    R/I : Type₀
+    R/I = R / (λ x y → x - y ∈ I)
 
-
-    Q : Type₀
-    Q = R / differenceIsInIdeal
-
-    homogenity : (x a b : R) (_ : differenceIsInIdeal a b)
-                 → differenceIsInIdeal (x + a) (x + b)
+    homogenity : ∀ (x a b : R)
+                 → (a - b ∈ I)
+                 → (x + a) - (x + b) ∈ I
     homogenity x a b p = subst (λ u → I(u) holds) calculation p
       where calculation =
               a - b                       ≡⟨ cong (λ u → a + u)
@@ -73,11 +46,24 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
                                                   (-isDistributive _ _) ⟩
               ((x + a) - (x + b)) ∎
       
-    translate : R → Q → Q
-    translate x = elim (λ r → squash/)
-                       (λ y → [ x + y ])
-                       λ y y' diffrenceInIdeal → eq/ (x + y) (x + y') (homogenity x y y' diffrenceInIdeal)
+    translate : R → R/I → R/I
+    translate x = elim
+                    (λ r → squash/)
+                    (λ y → [ x + y ])
+                    λ y y' diffrenceInIdeal → eq/ (x + y) (x + y') (homogenity x y y' diffrenceInIdeal)
+
 {-
+    isSetR/I : isSet R/I
+    isSetR/I = squash/
+
+    homogenity' : (x y : R) → (x - y ∈ I) 
+                  → translate x ≡ translate y
+    homogenity' x y x-y∈I i r = pointwise-equal r i
+      where
+        pointwise-equal : ∀ (u : R/I)
+                          → translate x u ≡ translate y u
+        pointwise-equal = elim (λ u p q → {!isSetR/I !}) {!!} {!!} {!!}
+        
     homogenity' : (x x' : R) (_ : differenceIsInIdeal x x')
                   → translate x ≡ translate x'
     homogenity' x x' differenceInIdeal =
