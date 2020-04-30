@@ -21,7 +21,7 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
       +-closed : {x y : R} → x ∈ I → y ∈ I → x + y ∈ I
       -closed : {x : R} → x ∈ I → - x ∈ I
       0′-closed : 0′ ∈ I
-      ·-closed : {r x : R} → x ∈ I → r · x ∈ I
+      ·-closed : {x : R} → (r : R) → x ∈ I → r · x ∈ I
   
   module _ (I : R → hProp₀) (isIdeal : is-ideal I) where
     R/I : Type₀
@@ -131,3 +131,34 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
       where
         eq : (x : R) → [ x ] +/I 0/I ≡ [ x ]
         eq x i = [ +-is-unital x i ]
+
+    _·/I_ : R/I → R/I → R/I
+    _·/I_ =
+      elim (λ x → isOfHLevelΠ 2 (λ y → squash/))
+               (λ x → left· x)
+               eq'
+      where
+        eq : (x y y' : R) → (y - y' ∈ I) → [ x · y ] ≡ [ x · y' ]
+        eq x y y' y-y'∈I = eq/ _ _ (subst (λ u → u ∈ I)
+                                          (x · (y - y')            ≡⟨ right-distributive _ _ _ ⟩
+                                          ((x · y) + x · (- y'))   ≡⟨ cong (λ u → (x · y) + u) (-commutes-with-· x y')  ⟩
+                                          (x · y) - (x · y')       ∎)
+                                          (is-ideal.·-closed isIdeal x y-y'∈I))
+        left· : (x : R) → R/I → R/I
+        left· x = elim (λ y → squash/)
+                     (λ y → [ x · y ])
+                     (eq x)
+        eq' : (x x' : R) → (x - x' ∈ I) → left· x ≡ left· x' 
+        eq' x x' x-x'∈I i y = elimProp (λ y → squash/ (left· x y) (left· x' y))
+                                       (λ y → eq′ y)
+                                       y i
+                              where
+                                eq′ : (y : R) → left· x [ y ] ≡ left· x' [ y ]
+                                eq′ y = eq/ (x · y) (x' · y)
+                                            (subst (λ u → u ∈ I)
+                                                   (y · (x - x')            ≡⟨ right-distributive _ _ _ ⟩
+                                                   (y · x) + (y · (- x'))   ≡⟨ cong (λ u → (y · x) + u) (-commutes-with-· y x') ⟩
+                                                   (y · x) - (y · x')       ≡⟨ cong (λ u → u - (y · x')) (·-is-commutative y x) ⟩
+                                                   (x · y) - (y · x')       ≡⟨ cong (λ u → (x · y) - u) (·-is-commutative y x') ⟩
+                                                   x · y - (x' · y)         ∎)
+                                                   (is-ideal.·-closed isIdeal y x-x'∈I))
