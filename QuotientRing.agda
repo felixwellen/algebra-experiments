@@ -193,7 +193,7 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
     /I-distributive = elimProp (λ x → isOfHLevelΠ 1 λ y → isOfHLevelΠ 1 λ z → squash/ _ _)
                                (λ x → elimProp (λ y → isOfHLevelΠ 1 λ z → squash/ _ _)
                                                (λ y → elimProp (λ z → squash/ _ _)
-                                                               {!λ z → eq x y z!}))
+                                                               λ z → eq x y z))
       where
         eq : (x y z : R) → ([ x ] +/I [ y ]) ·/I [ z ] ≡ ([ x ] ·/I [ z ]) +/I ([ y ] ·/I [ z ])
         eq x y z i = [ distributive x y z i ]
