@@ -5,7 +5,6 @@ open import Cubical.Foundations.HLevels
 open import Cubical.HITs.SetQuotients.Base
 open import Cubical.HITs.SetQuotients.Properties
 open import Basics
-open import AbelianGroup
 open import Ring
 
 module QuotientRing where
@@ -28,11 +27,9 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
     R/I : Type₀
     R/I = R / (λ x y → x - y ∈ I)
 
-    homogenity : ∀ (x a b : R)
-                 → (a - b ∈ I)
-                 → (x + a) - (x + b) ∈ I
-    homogenity x a b p = subst (λ u → I(u) holds) calculation p
-      where calculation =
+    differenceIsTranslationInvariant : ∀ (x a b : R)
+                                       → a - b ≡ (x + a) - (x + b)
+    differenceIsTranslationInvariant x a b =
               a - b                       ≡⟨ cong (λ u → a + u)
                                                   (sym (+-is-unital′ _)) ⟩
               (a + (0′ + (- b)))          ≡⟨ cong (λ u → a + (u + (- b)))
@@ -45,6 +42,12 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
               ((x + a) + ((- x) + (- b))) ≡⟨ cong (λ u → (x + a) + u)
                                                   (-isDistributive _ _) ⟩
               ((x + a) - (x + b)) ∎
+
+    homogenity : ∀ (x a b : R)
+                 → (a - b ∈ I)
+                 → (x + a) - (x + b) ∈ I
+    homogenity x a b p = subst (λ u → u ∈ I) (differenceIsTranslationInvariant x a b) p
+      where 
       
     translate : R → R/I → R/I
     translate x = elim
@@ -52,37 +55,32 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
                     (λ y → [ x + y ])
                     λ y y' diffrenceInIdeal → eq/ (x + y) (x + y') (homogenity x y y' diffrenceInIdeal)
 
-{-
     isSetR/I : isSet R/I
     isSetR/I = squash/
+    [_]/I : (a : R) → R/I
+    [ a ]/I = [ a ]
 
+    lemma : (x y a : R)
+            → x - y ∈ I
+            → [ x + a ]/I ≡ [ y + a ]/I
+    lemma x y a x-y∈I = eq/ (x + a) (y + a) (subst (λ u → I u holds) calculate x-y∈I)
+      where calculate : x - y ≡ (x + a) - (y + a)
+            calculate =
+                      x - y                 ≡⟨ differenceIsTranslationInvariant a x y ⟩
+                      ((a + x) - (a + y))   ≡⟨ cong (λ u → u - (a + y)) (+-is-commutative _ _) ⟩ 
+                      ((x + a) - (a + y))   ≡⟨ cong (λ u → (x + a) - u) (+-is-commutative _ _) ⟩ 
+                      ((x + a) - (y + a))   ∎
+    
     homogenity' : (x y : R) → (x - y ∈ I) 
                   → translate x ≡ translate y
     homogenity' x y x-y∈I i r = pointwise-equal r i
       where
         pointwise-equal : ∀ (u : R/I)
                           → translate x u ≡ translate y u
-        pointwise-equal = elim (λ u p q → {!isSetR/I !}) {!!} {!!} {!!}
-        
-    homogenity' : (x x' : R) (_ : differenceIsInIdeal x x')
-                  → translate x ≡ translate x'
-    homogenity' x x' differenceInIdeal =
-      λ i y → elim
-                (λ z → {!!})
-                (λ y' → eq y' i)
-                {!!}
-                {!!}
-      where zz : (y : R) → (x + y) - (x' + y) ≡ x - x'
-            zz y = (x + y) - (x' + y)  ≡⟨ {!!} ⟩
-                   x - x'              ∎
-            eq : (y : R)
-                 → [ x + y ] ≡ [ x' + y ] mod differenceIsInIdeal
-            eq y = eq/ (x + y) (x' + y)
-                       (subst (λ u → I(u) holds) (sym (zz y)) differenceInIdeal)
-            
-    _+/_ : Q → Q → Q
-    _+/_ = elim
-             (λ r → isOfHLevelPi 2 λ _ → squash/)
-             translate
-             homogenity'
--}
+        pointwise-equal = elimProp (λ u → isSetR/I (translate x u) (translate y u))
+                                   (λ a → lemma x y a x-y∈I)
+
+    _+/I_ : R/I → R/I → R/I
+    x +/I y = (elim R/I→R/I-isSet translate homogenity' x) y
+      where
+        R/I→R/I-isSet = (λ r →  isOfHLevelΠ 2 (λ _ → squash/))
