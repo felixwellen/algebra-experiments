@@ -63,7 +63,7 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
     lemma : (x y a : R)
             → x - y ∈ I
             → [ x + a ]/I ≡ [ y + a ]/I
-    lemma x y a x-y∈I = eq/ (x + a) (y + a) (subst (λ u → I u holds) calculate x-y∈I)
+    lemma x y a x-y∈I = eq/ (x + a) (y + a) (subst (λ u → u ∈ I) calculate x-y∈I)
       where calculate : x - y ≡ (x + a) - (y + a)
             calculate =
                       x - y                 ≡⟨ differenceIsTranslationInvariant a x y ⟩
@@ -84,3 +84,50 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
     x +/I y = (elim R/I→R/I-isSet translate homogenity' x) y
       where
         R/I→R/I-isSet = (λ r →  isOfHLevelΠ 2 (λ _ → squash/))
+
+    +/I-is-commutative : (x y : R/I) → x +/I y ≡ y +/I x
+    +/I-is-commutative = elimProp (λ x → isOfHLevelΠ 1 λ y → squash/ (x +/I y) (y +/I x))
+                                      (λ x' → elimProp (λ _ → squash/ _ _)
+                                                       λ y' → eq x' y') 
+                                                       
+       where eq : (x y : R) → [ x ] +/I [ y ] ≡ [ y ] +/I [ x ]
+             eq x y i =  [ +-is-commutative x y i ]
+
+    +/I-is-associative : (x y z : R/I) → x +/I (y +/I z) ≡ (x +/I y) +/I z
+    +/I-is-associative = elimProp
+                           (λ x → isOfHLevelΠ 1 λ y → isOfHLevelΠ 1 λ z → squash/ _ _)
+                           (λ x' → elimProp
+                                     (λ y → isOfHLevelΠ 1 λ z → squash/ _ _)
+                                     λ y' → elimProp (λ z → squash/ _ _)
+                                                     (λ z' → eq x' y' z'))
+                                                     
+      where eq : (x y z : R) → [ x ] +/I ([ y ] +/I [ z ]) ≡ ([ x ] +/I [ y ]) +/I [ z ]
+            eq x y z i =  [ +-is-associative x y z i ]
+
+    0/I : R/I
+    0/I = [ 0′ ]
+
+    1/I : R/I
+    1/I = [ 1′ ]
+
+    -/I : R/I → R/I
+    -/I = elim (λ _ → squash/) (λ x' → [ - x' ]) eq
+      where
+        eq : (x y : R) → (x - y ∈ I) → [ - x ] ≡ [ - y ]
+        eq x y x-y∈I = eq/ (- x) (- y) (subst (λ u → u ∈ I) eq' (is-ideal.-closed isIdeal x-y∈I))
+          where
+            eq' = - (x + (- y))       ≡⟨ sym (-isDistributive _ _) ⟩
+                  (- x) - (- y)       ∎
+
+    +/I-has-inverses : (x : R/I) → x +/I (-/I x) ≡ 0/I
+    +/I-has-inverses = elimProp (λ x → squash/ _ _) eq
+      where
+        eq : (x : R) → [ x ] +/I (-/I [ x ]) ≡ 0/I
+        eq x i = [ +-has-inverses x i ]
+
+    
+    +/I-is-unital : (x : R/I) → x +/I 0/I ≡ x
+    +/I-is-unital = elimProp (λ x → squash/ _ _) eq
+      where
+        eq : (x : R) → [ x ] +/I 0/I ≡ [ x ]
+        eq x i = [ +-is-unital x i ]
