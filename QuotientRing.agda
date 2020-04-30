@@ -162,3 +162,56 @@ module ideal {R : Type₀}  ⦃ _ : ring-structure {R} ⦄ where
                                                    (x · y) - (y · x')       ≡⟨ cong (λ u → (x · y) - u) (·-is-commutative y x') ⟩
                                                    x · y - (x' · y)         ∎)
                                                    (is-ideal.·-closed isIdeal y x-x'∈I))
+
+    -- copy paste from '+/I' - this is preliminary anyway
+    ·/I-is-commutative : (x y : R/I) → x ·/I y ≡ y ·/I x
+    ·/I-is-commutative = elimProp (λ x → isOfHLevelΠ 1 λ y → squash/ (x ·/I y) (y ·/I x))
+                                      (λ x' → elimProp (λ _ → squash/ _ _)
+                                                       λ y' → eq x' y') 
+       where eq : (x y : R) → [ x ] ·/I [ y ] ≡ [ y ] ·/I [ x ]
+             eq x y i =  [ ·-is-commutative x y i ]
+
+    ·/I-is-associative : (x y z : R/I) → x ·/I (y ·/I z) ≡ (x ·/I y) ·/I z
+    ·/I-is-associative = elimProp
+                           (λ x → isOfHLevelΠ 1 λ y → isOfHLevelΠ 1 λ z → squash/ _ _)
+                           (λ x' → elimProp
+                                     (λ y → isOfHLevelΠ 1 λ z → squash/ _ _)
+                                     λ y' → elimProp (λ z → squash/ _ _)
+                                                     (λ z' → eq x' y' z'))
+                                                     
+      where eq : (x y z : R) → [ x ] ·/I ([ y ] ·/I [ z ]) ≡ ([ x ] ·/I [ y ]) ·/I [ z ]
+            eq x y z i =  [ ·-is-associative x y z i ]
+
+    ·/I-is-unital : (x : R/I) → 1/I ·/I x ≡ x
+    ·/I-is-unital = elimProp (λ x → squash/ _ _) eq
+      where
+        eq : (x : R) → 1/I ·/I [ x ] ≡ [ x ]
+        eq x i = [ ·-is-unital x i ]
+
+
+    /I-distributive : (x y z : R/I) → (x +/I y) ·/I z ≡ (x ·/I z) +/I (y ·/I z)
+    /I-distributive = elimProp (λ x → isOfHLevelΠ 1 λ y → isOfHLevelΠ 1 λ z → squash/ _ _)
+                               (λ x → elimProp (λ y → isOfHLevelΠ 1 λ z → squash/ _ _)
+                                               (λ y → elimProp (λ z → squash/ _ _)
+                                                               {!λ z → eq x y z!}))
+      where
+        eq : (x y z : R) → ([ x ] +/I [ y ]) ·/I [ z ] ≡ ([ x ] ·/I [ z ]) +/I ([ y ] ·/I [ z ])
+        eq x y z i = [ distributive x y z i ]
+
+
+    has-ring-structure : ring-structure {R/I} 
+    has-ring-structure = record
+                           { _+_ = _+/I_
+                           ; -_ = -/I
+                           ; 0′ = 0/I
+                           ; +-is-associative = +/I-is-associative
+                           ; +-is-unital = +/I-is-unital
+                           ; +-is-commutative = +/I-is-commutative
+                           ; +-has-inverses = +/I-has-inverses
+                           ; _·_ = _·/I_
+                           ; 1′ = 1/I
+                           ; ·-is-associative = ·/I-is-associative
+                           ; ·-is-unital = ·/I-is-unital
+                           ; ·-is-commutative = ·/I-is-commutative
+                           ; distributive = /I-distributive
+                           }
