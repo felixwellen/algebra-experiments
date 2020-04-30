@@ -100,7 +100,13 @@ record ring-structure {A : Type₀} : Type₀ where
           x + (0′ + (- x))          ≡⟨ cong (λ u → x + u) (+-is-unital′ _) ⟩
           x + (- x)                 ≡⟨ +-has-inverses _ ⟩
           0′ ∎)
-  
+
+  -commutes-with-· : (x y : A) →  x · (- y) ≡ - (x · y)
+  -commutes-with-· x y = isInverseTo- (x · y) (x · (- y))
+                                      ((x · y) + (x · (- y))   ≡⟨ sym (right-distributive _ _ _) ⟩
+                                       x · (y + (- y))         ≡⟨ cong (λ u → x · u) (+-has-inverses y) ⟩
+                                       x · 0′                  ≡⟨ sym (0-nullifies x) ⟩
+                                       0′ ∎) 
   
 data ZeroRing : Set where
   0″ : ZeroRing
