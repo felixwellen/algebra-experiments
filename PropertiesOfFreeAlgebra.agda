@@ -60,7 +60,7 @@ module _ (A : Type₀) (A-is-0-truncated : isOfHLevel 2 A) ⦃ _ : ring-structur
 
   evaluate-as-homomorphism : (I → A) → (hom R (R[ I ]) A)
   evaluate-as-homomorphism φ = (evaluate-at φ) , (evaluation-is-homomorphic φ)
-
+{-
   universal-property : isEquiv evaluate-as-homomorphism
   universal-property = isoToIsEquiv (iso evaluate-as-homomorphism
                                          evaluate-on-variables
@@ -69,3 +69,4 @@ module _ (A : Type₀) (A-is-0-truncated : isOfHLevel 2 A) ⦃ _ : ring-structur
                        where
                          evaluate-on-variables : (hom R (R[ I ]) A) → (I → A)
                          evaluate-on-variables ψ = (λ x → fst ψ (R[_].var x))
+-}

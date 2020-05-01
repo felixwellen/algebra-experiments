@@ -86,7 +86,10 @@ record ring-structure {A : Type₀} : Type₀ where
                        (- x) + (x + y) ≡⟨ cong (λ u → (- x) + u) p ⟩
                        (- x) + 0′      ≡⟨ +-is-unital _ ⟩
                        - x             ∎ 
-  
+
+  0-selfinverse : - 0′ ≡ 0′
+  0-selfinverse = sym (isInverseTo- _ _ (+-is-unital 0′))
+
   -isDistributive : (x y : A) →  (- x) + (- y) ≡ - (x + y)
   -isDistributive x y =
     isInverseTo- _ _
@@ -100,9 +103,15 @@ record ring-structure {A : Type₀} : Type₀ where
           x + (0′ + (- x))          ≡⟨ cong (λ u → x + u) (+-is-unital′ _) ⟩
           x + (- x)                 ≡⟨ +-has-inverses _ ⟩
           0′ ∎)
+
+  -commutes-with-· : (x y : A) →  x · (- y) ≡ - (x · y)
+  -commutes-with-· x y = isInverseTo- (x · y) (x · (- y))
+                                      ((x · y) + (x · (- y))   ≡⟨ sym (right-distributive _ _ _) ⟩
+                                       x · (y + (- y))         ≡⟨ cong (λ u → x · u) (+-has-inverses y) ⟩
+                                       x · 0′                  ≡⟨ sym (0-nullifies x) ⟩
+                                       0′ ∎) 
   
-  
-data ZeroRing : Set where
+data ZeroRing : Type₀ where
   0″ : ZeroRing
 
 0-ring-structure : ring-structure {ZeroRing}
@@ -122,9 +131,9 @@ data ZeroRing : Set where
                      ; distributive = λ _ _ _ → refl
                      }
 
-module _ (R : Set) ⦃ _ : ring-structure {R} ⦄ where
+module _ (R : Type₀) ⦃ _ : ring-structure {R} ⦄ where
 
-  record algebra-structure {A : Set} ⦃ _ : ring-structure {A} ⦄ : Set where
+  record algebra-structure {A : Set} ⦃ _ : ring-structure {A} ⦄ : Type₀ where
     open ring-structure ⦃...⦄
     field
       _⋆_ : R → A → A        -- \*
